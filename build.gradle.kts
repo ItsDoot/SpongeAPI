@@ -4,13 +4,15 @@ plugins {
     id("org.spongepowered.gradle.sponge.dev")
     id("org.spongepowered.gradle.sponge.deploy")
     id("org.spongepowered.gradle.sort")
-
     id("org.spongepowered.event-impl-gen") version "5.7.0"
+
+    checkstyle
 }
 
 base {
     archivesBaseName = "spongeapi"
 }
+
 val ap by sourceSets.registering {
     compileClasspath += sourceSets.main.get().compileClasspath + sourceSets.main.get().output
 }
@@ -27,7 +29,6 @@ deploySponge {
         }
     }
 }
-
 
 // Project dependencies
 dependencies {
@@ -85,6 +86,17 @@ dependencies {
     implementation("org.ow2.asm:asm:6.2")
 }
 
+// Disable checkstyle by default (won't run unless 'checkstyle' is explicitly invoked)
+val checkstyleTask = task("checkstyle") {
+    setDependsOn(tasks.withType<Checkstyle>())
+}
+
+gradle.taskGraph.whenReady {
+    if (checkstyleTask !in allTasks) {
+        tasks.withType<Checkstyle>().forEach { task -> task.enabled = false }
+    }
+}
+
 tasks {
     genEventImpl {
         outputFactory = "org.spongepowered.api.event.SpongeEventFactory"
@@ -92,7 +104,7 @@ tasks {
         exclude("org/spongepowered/api/event/cause/")
         exclude("org/spongepowered/api/event/filter/")
         exclude("org/spongepowered/api/event/impl/")
-        inclusiveAnnotations = setOf("org.spongepowered.api.util.annotation.eventgen.GenerateFactoryMethod")
+        inclusiveAnnotation("org.spongepowered.api.util.annotation.eventgen.GenerateFactoryMethod")
     }
 
     jar {
@@ -105,7 +117,6 @@ tasks {
     val shadowJar by registering(ShadowJar::class) {
         archiveClassifier.set("shaded")
         from(ap.get().output)
-
     }
 
     sortClassFields {
@@ -116,6 +127,16 @@ tasks {
 
     artifacts {
         archives(shadowJar)
+    }
+
+    checkstyle {
+        toolVersion = "8.7"
+        configFile = file("checkstyle.xml")
+        configProperties = mapOf(
+                "basedir" to projectDir,
+                "suppressions" to file("checkstyle-suppressions.xml"),
+                "severity" to "warning"
+        )
     }
 }
 
@@ -129,4 +150,3 @@ val catalogClasses = listOf(
         "org.spongepowered.api.data.Keys",
         "org.spongepowered.api.data.type.PandaGenes"
 )
-
