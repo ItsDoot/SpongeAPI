@@ -1,4 +1,5 @@
-rootProject.name = "SpongeAPI"
+val name: String by settings
+rootProject.name = name
 
 pluginManagement {
     repositories {
