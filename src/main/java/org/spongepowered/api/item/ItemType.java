@@ -24,7 +24,9 @@
  */
 package org.spongepowered.api.item;
 
+import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -38,6 +40,16 @@ import java.util.Optional;
  */
 @CatalogedBy(ItemTypes.class)
 public interface ItemType extends CatalogType, Translatable, DataHolder.Immutable<ItemType> {
+
+    /**
+     * Attempts to retrieve the {@link ItemType} based on the key given.
+     *
+     * @param key The catalog key
+     * @return The found item type, if available
+     */
+    static Optional<ItemType> get(CatalogKey key) {
+        return Sponge.getRegistry().getCatalogRegistry().get(ItemType.class, key);
+    }
 
     /**
      * Gets the corresponding {@link BlockType} of this item if one exists.
