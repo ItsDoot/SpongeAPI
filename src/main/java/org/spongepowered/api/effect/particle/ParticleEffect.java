@@ -63,7 +63,7 @@ public interface ParticleEffect extends DataSerializable {
      * @param <V> The value type
      * @return The option value if present, otherwise {@link Optional#empty()}
      */
-    default <V> Optional<V> getOption(Supplier<? extends ParticleOption<V>> option) {
+    default <V> Optional<V> getOption(DefaultedRegistryReference<? extends ParticleOption<V>> option) {
         return this.getOption(option.get());
     }
 
@@ -84,7 +84,7 @@ public interface ParticleEffect extends DataSerializable {
      * @param <V> The value type
      * @return The option value if present, otherwise {@link Optional#empty()}
      */
-    default <V> Optional<V> getOptionOrDefault(Supplier<? extends ParticleOption<V>> option) {
+    default <V> Optional<V> getOptionOrDefault(DefaultedRegistryReference<? extends ParticleOption<V>> option) {
         return this.getOptionOrDefault(option.get());
     }
 
